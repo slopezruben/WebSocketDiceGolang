@@ -1,0 +1,348 @@
+/* Fondo temático RPG */
+.rpg-bg {
+    min-height: 100vh;
+    background: url('https://www.transparenttextures.com/patterns/old-mathematics.png'), #f5ecd6;
+    background-size: cover;
+    font-family: 'MedievalSharp', 'Georgia', serif;
+    padding: 0;
+    margin: 0;
+}
+
+/* Recuadro flotante para el selector de dados */
+#dice-selector {
+    position: fixed;
+    top: 5vh;
+    right: 5vw;
+    width: 340px;
+    background: rgba(255, 248, 220, 0.97);
+    border: 4px solid #bfa76f;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px 0 rgba(60, 40, 10, 0.25);
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    z-index: 100;
+    font-family: 'MedievalSharp', 'Georgia', serif;
+    transition: box-shadow 0.2s;
+}
+
+#dice-selector:hover {
+    box-shadow: 0 12px 40px 0 rgba(60, 40, 10, 0.35);
+}
+
+/* Título y estado del socket */
+#socket-status {
+    font-size: 1.1rem;
+    color: #7c5e2a;
+    margin-bottom: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Selector de dados */
+.dice-select {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.7rem;
+    gap: 0.7rem;
+}
+
+/* Iconos de dados */
+.dice-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    min-width: 28px;
+    height: 32px;
+    margin-right: 0.2rem;
+}
+
+.dice-select label {
+    font-size: 1.1rem;
+    color: #6d4c1b;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.dice-select input[type="number"] {
+    width: 60px;
+    border: 2px solid #bfa76f;
+    border-radius: 8px;
+    padding: 0.3rem 0.5rem;
+    background: #fffbe6;
+    color: #6d4c1b;
+    font-size: 1.1rem;
+    font-family: inherit;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.dice-select input[type="number"]:focus {
+    border: 2px solid #d4b16a;
+    background: #fff8d1;
+}
+
+/* Botón de lanzar dados */
+#roll-button {
+    width: 100%;
+    margin-top: 1.2rem;
+    background: linear-gradient(90deg, #bfa76f 0%, #e2c98f 100%);
+    color: #4b320a;
+    font-size: 1.2rem;
+    font-family: 'MedievalSharp', 'Georgia', serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    padding: 0.7rem 0;
+    box-shadow: 0 2px 8px rgba(60, 40, 10, 0.10);
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+#roll-button:hover {
+    background: linear-gradient(90deg, #e2c98f 0%, #bfa76f 100%);
+    box-shadow: 0 4px 16px rgba(60, 40, 10, 0.18);
+}
+
+/* Resultados de los usuarios */
+#results {
+    margin-top: 1.5rem;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+#results > div {
+    background: rgba(255, 255, 240, 0.92);
+    border: 2px solid #d4b16a;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    padding: 0.7rem 0.8rem;
+    box-shadow: 0 1px 4px rgba(60, 40, 10, 0.08);
+}
+
+#results p {
+    margin: 0.2rem 0;
+    color: #4b320a;
+    font-size: 1rem;
+    font-family: 'MedievalSharp', 'Georgia', serif;
+}
+
+/* Scrollbar personalizado para resultados */
+#results {
+    scrollbar-width: thin;
+    scrollbar-color: #bfa76f #f5ecd6;
+}
+#results::-webkit-scrollbar {
+    width: 8px;
+}
+#results::-webkit-scrollbar-thumb {
+    background: #bfa76f;
+    border-radius: 8px;
+}
+#results::-webkit-scrollbar-track {
+    background: #f5ecd6;
+    border-radius: 8px;
+}
+
+/* Clase para resultados alineados a la izquierda */
+.results-left {
+    position: absolute;
+    top: 5vh;
+    left: 5vw;
+    width: 68vw;
+    min-width: 260px;
+    max-width: 900px;
+    /* Mantiene el estilo de fondo y scroll */
+    background: rgba(255, 255, 240, 0.92);
+    border: 2px solid #d4b16a;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px 0 rgba(60, 40, 10, 0.10);
+    padding: 1.2rem 1.2rem 1.2rem 1.2rem;
+    z-index: 10;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: stretch;
+}
+
+/* Ajuste para el div interno de resultados */
+#results > div {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0.5rem 0.5rem;
+    margin-bottom: 0.7rem;
+}
+
+/* Tarjeta de resultado de usuario */
+.user-result-card {
+    background: rgba(255, 255, 240, 0.97);
+    border: 2px solid #bfa76f;
+    border-radius: 14px;
+    min-width: 200px;
+    max-width: 260px;
+    box-shadow: 0 2px 12px rgba(60, 40, 10, 0.10);
+    padding: 0.7rem 1rem 0.7rem 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-family: 'MedievalSharp', 'Georgia', serif;
+    transition: box-shadow 0.2s;
+}
+
+.user-result-card:hover {
+    box-shadow: 0 4px 24px rgba(60, 40, 10, 0.18);
+    border-color: #d4b16a;
+}
+
+.user-result-card p {
+    margin: 0.2rem 0;
+    color: #4b320a;
+    font-size: 1rem;
+    font-family: inherit;
+    word-break: break-word;
+}
+
+/* Flex interno para nombre y dados */
+.user-result-flex {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.2rem;
+    width: 100%;
+}
+
+/* Nombre del usuario */
+.user-result-name {
+    font-weight: bold;
+    color: #7c5e2a;
+    font-size: 1.1rem;
+    min-width: 80px;
+    max-width: 120px;
+    word-break: break-word;
+    flex-shrink: 0;
+    font-family: 'MedievalSharp', 'Georgia', serif;
+}
+
+/* Resultados de dados */
+.user-result-dice {
+    flex: 1;
+    color: #4b320a;
+    font-size: 1rem;
+    font-family: inherit;
+    margin-left: 1.2rem;
+    word-break: break-word;
+}
+
+.user-result-dice p {
+    margin: 0.2rem 0;
+}
+
+/* Elimina el fondo y bordes duplicados del contenedor principal */
+#results > div:not(.user-result-card) {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Estilos para la fila de resultados de dados */
+.dice-results-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1.2rem;
+    align-items: flex-end;
+    justify-content: flex-start;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+}
+
+.dice-result-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 40px;
+}
+
+.dice-result-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dice-result-value {
+    margin-top: 0.2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #4b320a;
+    font-family: 'MedievalSharp', 'Georgia', serif;
+    text-align: center;
+}
+
+/* Total de cada dado en el recuadro de selección */
+.dice-total {
+    display: inline-block;
+    margin-left: 0.7rem;
+    color: #7c5e2a;
+    font-size: 1.05rem;
+    font-weight: bold;
+    font-family: 'MedievalSharp', 'Georgia', serif;
+    vertical-align: middle;
+}
+
+/* Responsive para móviles */
+@media (max-width: 900px) {
+    .results-left {
+        width: 96vw;
+        left: 2vw;
+        padding: 0.7rem 0.3rem;
+    }
+    .user-results-row {
+        flex-wrap: wrap;
+        gap: 0.7rem;
+        justify-content: flex-start;
+    }
+    .user-result-card {
+        min-width: 160px;
+        max-width: 98vw;
+        padding: 0.7rem 0.5rem 0.5rem 0.5rem;
+    }
+}
+@media (max-width: 600px) {
+    .results-left {
+        position: static;
+        width: 98vw;
+        left: unset;
+        top: unset;
+        max-width: unset;
+        padding: 0.5rem 0.1rem;
+    }
+    #dice-selector {
+        position: static;
+        width: 98vw;
+        margin: 1vw auto;
+        top: unset;
+        right: unset;
+        left: unset;
+        border-width: 2px;
+        padding: 1.2rem 0.5rem 1rem 0.5rem;
+    }
+    .user-results-row {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+    .user-result-card {
+        width: 98vw;
+        min-width: unset;
+        max-width: unset;
+        margin: 0 auto;
+    }
+}

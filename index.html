@@ -2,43 +2,103 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Google Fonts for RPG style -->
+        <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
         <title>Daducos</title>
     </head>
-    <body>
-        <div id="dice-selector">
+    <body class="rpg-bg">
+        <div id="dice-selector" class="shadow-lg">
             <p id="socket-status">Connecting...</p>
             <div class="dice-select" id="d4">
+                <!-- D4 SVG -->
+                <span class="dice-icon">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,3 29,27 3,27" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="22" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">4</text>
+                    </svg>
+                </span>
                 <input type="number" id="d4-input" value="0" min="0" max="100">
                 <label for="d4-input">d4</label>
             </div>
             <div class="dice-select" id="d6">
+                <!-- D6 SVG -->
+                <span class="dice-icon">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <rect x="5" y="5" width="22" height="22" rx="4" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="21" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">6</text>
+                    </svg>
+                </span>
                 <input type="number" id="d6-input" value="0" min="0" max="100">
                 <label for="d6-input">d6</label>
             </div>
             <div class="dice-select" id="d8">
+                <!-- D8 SVG -->
+                <span class="dice-icon">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,4 28,16 16,28 4,16" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="20" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">8</text>
+                    </svg>
+                </span>
                 <input type="number" id="d8-input" value="0" min="0" max="100">
                 <label for="d8-input">d8</label>
             </div>
             <div class="dice-select" id="d10">
+                <!-- D10 SVG -->
+                <span class="dice-icon">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,3 29,16 16,29 3,16" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="20" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">10</text>
+                    </svg>
+                </span>
                 <input type="number" id="d10-input" value="0" min="0" max="100">
                 <label for="d10-input">d10</label>
             </div>
             <div class="dice-select" id="d12">
+                <!-- D12 SVG -->
+                <span class="dice-icon">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,3 28,10 28,22 16,29 4,22 4,10" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="20" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">12</text>
+                    </svg>
+                </span>
                 <input type="number" id="d12-input" value="0" min="0" max="100">
                 <label for="d12-input">d12</label>
             </div>
             <div class="dice-select" id="d20">
+                <!-- D20 SVG -->
+                <span class="dice-icon">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,3 29,10 29,22 16,29 3,22 3,10" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <polygon points="16,3 29,10 16,29 3,10" fill="none" stroke="#6d4c1b" stroke-width="1"/>
+                        <text x="16" y="20" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">20</text>
+                    </svg>
+                </span>
                 <input type="number" id="d20-input" value="0" min="0" max="100">
                 <label for="d20-input">d20</label>
             </div>
             <div class="dice-select" id="d100">
+                <!-- D100 SVG -->
+                <span class="dice-icon">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <ellipse cx="16" cy="16" rx="13" ry="13" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="21" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">100</text>
+                    </svg>
+                </span>
                 <input type="number" id="d100-input" value="0" min="0" max="100">
                 <label for="d100-input">d100</label>
             </div>
-            <button id="roll-button">Roll Dice</button>
-            <div id="results">
-            </div> 
+            <div class="d-flex align-items-center gap-2 mt-2">
+                <button id="roll-button">Roll Dice</button>
+                <button id="clear-results" class="btn btn-outline-secondary btn-sm px-2" type="button" title="Clear inputs">
+                    Clear
+                </button>
+            </div>
         </div>
+        <div id="results" class="results-left">
+        </div> 
     </body>
     <script>
         const rollButton = document.getElementById('roll-button');
@@ -90,22 +150,120 @@
             requestLog()
         };
 
+        // Función para obtener el SVG de cada dado (solo por tipo, ignora el número delante)
+        function getDiceSVG(diceType) {
+            switch (diceType) {
+                case "d4":
+                    return `<svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,3 29,27 3,27" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="22" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">4</text>
+                    </svg>`;
+                case "d6":
+                    return `<svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <rect x="5" y="5" width="22" height="22" rx="4" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="21" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">6</text>
+                    </svg>`;
+                case "d8":
+                    return `<svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,4 28,16 16,28 4,16" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="20" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">8</text>
+                    </svg>`;
+                case "d10":
+                    return `<svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,3 29,16 16,29 3,16" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="20" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">10</text>
+                    </svg>`;
+                case "d12":
+                    return `<svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,3 28,10 28,22 16,29 4,22 4,10" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="20" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">12</text>
+                    </svg>`;
+                case "d20":
+                    return `<svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polygon points="16,3 29,10 29,22 16,29 3,22 3,10" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <polygon points="16,3 29,10 16,29 3,10" fill="none" stroke="#6d4c1b" stroke-width="1"/>
+                        <text x="16" y="20" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">20</text>
+                    </svg>`;
+                case "d100":
+                    return `<svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <ellipse cx="16" cy="16" rx="13" ry="13" fill="#bfa76f" stroke="#6d4c1b" stroke-width="2"/>
+                        <text x="16" y="21" text-anchor="middle" fill="#4b320a" font-size="12" font-family="MedievalSharp, Georgia, serif">100</text>
+                    </svg>`;
+                default:
+                    return "";
+            }
+        }
+
+        // Añadir los dados y resultados, soportando <n>d<m> y múltiples resultados
+        // Ahora devuelve un objeto con los totales por tipo de dado
+        function addDiceResults(container, results) {
+            container.innerHTML = ""; // Limpia resultados anteriores
+            const diceRow = document.createElement("div");
+            diceRow.className = "dice-results-row";
+            const totals = {}; // { d4: 12, d6: 8, ... }
+
+            for (const [diceKey, value] of Object.entries(results)) {
+                // Extraer tipo de dado (d4, d6, etc) del final de la clave
+                const match = diceKey.match(/d(4|6|8|10|12|20|100)$/);
+                const diceType = match ? "d" + match[1] : diceKey;
+
+                // El valor puede ser un número, string, o array/coma
+                let values = [];
+                if (Array.isArray(value)) {
+                    values = value;
+                } else if (typeof value === "string" && value.includes(",")) {
+                    values = value.split(",").map(v => v.trim());
+                } else {
+                    values = [value];
+                }
+
+                // Suma total para este tipo de dado
+                let total = 0;
+                values.forEach(val => {
+                    const num = Number(val);
+                    if (!isNaN(num)) total += num;
+                });
+                totals[diceType] = (totals[diceType] || 0) + total;
+
+                // Para cada resultado, crea un icono+valor
+                values.forEach(val => {
+                    const diceCol = document.createElement("div");
+                    diceCol.className = "dice-result-col";
+                    diceCol.innerHTML = `
+                        <div class="dice-result-icon">${getDiceSVG(diceType)}</div>
+                        <div class="dice-result-value">${val}</div>
+                    `;
+                    diceRow.appendChild(diceCol);
+                });
+            }
+            container.appendChild(diceRow);
+            return totals;
+        }
+
         const addUserResultSpace = (user_id, user_name) => {
             const resultsDiv = document.getElementById('results');
             const userResultDiv = document.createElement('div');
             userResultDiv.id = `user-${user_id}`;
+            userResultDiv.className = "user-result-card";
 
-            // add user name
-            const userName = document.createElement('p');
-            userName.textContent = `User (${user_name} | user ID: ${user_id})`;
+            // Contenedor flex para nombre y resultados
+            const flexContainer = document.createElement('div');
+            flexContainer.className = "user-result-flex";
 
-            // add result section
-            const resultText = document.createElement('p');
+            // Nombre de usuario (solo el nombre)
+            const userName = document.createElement('div');
+            userName.className = "user-result-name";
+            userName.textContent = user_name;
+
+            // Sección de resultados
+            const resultText = document.createElement('div');
             resultText.id = `result-text-${user_id}`;
+            resultText.className = "user-result-dice";
             resultText.textContent = 'No results yet';
 
-            userResultDiv.appendChild(userName);
-            userResultDiv.appendChild(resultText);
+            flexContainer.appendChild(userName);
+            flexContainer.appendChild(resultText);
+            userResultDiv.appendChild(flexContainer);
             resultsDiv.appendChild(userResultDiv);
         };
 
@@ -128,14 +286,13 @@
                     }
 
                     const resultJSON = JSON.parse(content);
-                    resultText.innerHTML = ''; // Clear previous results
-
-                    for (const [diceType, result] of Object.entries(resultJSON)) {
-                        resultText.innerHTML += `<p>${diceType}: ${result}</p>`;
+                    if (Object.keys(resultJSON).length === 0) {
+                        resultText.textContent = 'No results yet';
+                    } else {
+                        // Mostrar resultados y obtener totales
+                        const totals = addDiceResults(resultText, resultJSON);
                     }
-
                     break;
-
                 case 'log':
                     sessionUserId = parseInt(content); 
                     break;
@@ -164,5 +321,11 @@
             handleMessage(data.action, data.content, data.user_id);
         }
 
+        // Clear inputs button logic
+        document.getElementById('clear-results').addEventListener('click', () => {
+            document.querySelectorAll('.dice-select input[type="number"]').forEach(input => {
+                input.value = 0;
+            });
+        });
     </script>
 </html>
