@@ -36,21 +36,20 @@
                 <label for="d100-input">d100</label>
             </div>
             <button id="roll-button">Roll Dice</button>
-            <div id="result">
-                <h2>Result</h2>
-                <p id="result-text">Click the button to roll the dice!</p>
+            <div id="results">
             </div> 
         </div>
     </body>
     <script>
         const rollButton = document.getElementById('roll-button');
+        var sessionUserId = undefined;
 
         rollButton.addEventListener('click', () => {
             // Get all dice inputs
             const diceInputs = document.querySelectorAll('.dice-select input[type="number"]');
 
             // Add inputs to an object
-            const message = { action: 'roll', content: ""  };
+            const message = { action: 'roll', content: "" , user_id: sessionUserId };
 
             diceInputs.forEach(input => {
                 const diceType = input.id.replace('-input', '');
@@ -82,7 +81,6 @@
             } else {
                 message.content = 'Anonymous';
             }
-
             // Send a request to the server to get the log
             socket.send(JSON.stringify(message));
         };
@@ -92,11 +90,44 @@
             requestLog()
         };
 
-        const handleMessage = (data) => {
-            const resultText = document.getElementById('result-text');
-            switch (data.action) {
+        const addUserResultSpace = (user_id, user_name) => {
+            const resultsDiv = document.getElementById('results');
+            const userResultDiv = document.createElement('div');
+            userResultDiv.id = `user-${user_id}`;
+
+            // add user name
+            const userName = document.createElement('p');
+            userName.textContent = `User (${user_name} | user ID: ${user_id})`;
+
+            // add result section
+            const resultText = document.createElement('p');
+            resultText.id = `result-text-${user_id}`;
+            resultText.textContent = 'No results yet';
+
+            userResultDiv.appendChild(userName);
+            userResultDiv.appendChild(resultText);
+            resultsDiv.appendChild(userResultDiv);
+        };
+
+        const removeUserResultSpace = (user_id) => {
+            const userResultDiv = document.getElementById(`user-${user_id}`);
+            if (userResultDiv) {
+                userResultDiv.remove();
+            } else {
+                console.error(`No result space found for user ID ${user_id}`);
+            }
+        };
+
+        const handleMessage = (action, content, user_id) => {
+            switch (action) {
                 case 'roll':
-                    const resultJSON = JSON.parse(data.content);
+                    const resultText = document.getElementById(`result-text-${user_id}`);
+                    if (!resultText) {
+                        console.error(`No result text found in user result space for user ID ${user_id}`);
+                        return;
+                    }
+
+                    const resultJSON = JSON.parse(content);
                     resultText.innerHTML = ''; // Clear previous results
 
                     for (const [diceType, result] of Object.entries(resultJSON)) {
@@ -104,19 +135,34 @@
                     }
 
                     break;
+
+                case 'log':
+                    sessionUserId = parseInt(content); 
+                    break;
+                case "user_joined":
+                    addUserResultSpace(user_id, content);
+                    break;
+                case "user_left":
+                    removeUserResultSpace(user_id);
+                    break;
+                case "users_in_room":
+                    const usersObj = JSON.parse(content);
+                    const usersArr = Object.values(usersObj);
+
+                    usersArr.forEach(user => {
+                        addUserResultSpace(user.user_id, user.username);
+                    });
+
+                    break;
                 default:
-                    console.error('Unknown action:', data.action);
+                    console.error('Unknown action:', action);
             }
         };
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            handleMessage(data);
+            handleMessage(data.action, data.content, data.user_id);
         }
 
-        // On page exit, close the WebSocket connection
-        window.addEventListener('beforeunload', () => {
-            socket.close();
-        });
     </script>
 </html>

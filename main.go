@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"maps"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -22,8 +24,8 @@ type ActionMessage struct {
 }
 
 type Connection struct {
-	Username string
-	c        *websocket.Conn
+	Username string          `json:"username"`
+	c        *websocket.Conn `json:"-"`
 }
 
 type Room struct {
@@ -34,6 +36,27 @@ type Room struct {
 var room = Room{
 	Name:  "default",
 	Users: make(map[int]*Connection),
+}
+
+func addUserToRoom(room_name string, userId int, userConnection *Connection) {
+	// Add a user to the room
+	if _, exists := room.Users[userId]; exists {
+		log.Printf("User with ID %d already exists in room %s", userId, room)
+		return
+	}
+
+	room.Users[userId] = userConnection
+	log.Printf("User %s with ID %d added to room %s", userConnection.Username, userId, room)
+}
+
+func removeUserFromRoom(room_name string, userId int) {
+	// Remove a user from the room
+	if _, exists := room.Users[userId]; !exists {
+		log.Printf("User with ID %d does not exist in room %v", userId, room)
+		return
+	}
+	delete(room.Users, userId)
+	log.Printf("User with ID %d removed from room %v", userId, room)
 }
 
 func sendErrorMessage(c *websocket.Conn, error_msg string) {
@@ -54,6 +77,13 @@ func sendJSONMessage(c *websocket.Conn, message []byte) {
 	err := c.WriteMessage(websocket.TextMessage, message)
 	if err != nil {
 		log.Printf("error %s when writing JSON message to client", err)
+	}
+}
+
+func sendMessageToRoom(room_name string, message []byte) {
+	for userConnection := range maps.Values(room.Users) {
+		sendJSONMessage(userConnection.c, message)
+		log.Printf("Sent message to user %s in room %s", userConnection.Username, room_name)
 	}
 }
 
@@ -83,7 +113,7 @@ func rollDice(dice string) ([]int, error) {
 	return total, nil
 }
 
-func handleActionMessage(c *websocket.Conn, msg ActionMessage) {
+func handleActionMessage(c *websocket.Conn, msg ActionMessage, userId int) {
 	// Handle the action message based on its content
 	log.Printf("Handling action: %s with content: %s", msg.Action, msg.Content)
 	var err error
@@ -102,14 +132,67 @@ func handleActionMessage(c *websocket.Conn, msg ActionMessage) {
 		}
 
 		marshalledResult, _ := json.Marshal(result)
-		marshalledResponse, _ := json.Marshal(&ActionMessage{"roll", string(marshalledResult)})
+		marshalledResponse, _ := json.Marshal(&ActionMessage{"roll", string(marshalledResult), userId})
 
-		log.Printf("Sending response: %s", string(marshalledResponse))
-		sendJSONMessage(c, marshalledResponse)
+		sendMessageToRoom("", marshalledResponse)
 	case "log":
-		// Create new user id
+		userConnection := &Connection{
+			Username: msg.Content,
+			c:        c,
+		}
 
+		marshalledResponse, _ := json.Marshal(&ActionMessage{
+			Action:  "log",
+			Content: strconv.Itoa(userId),
+		})
+		sendJSONMessage(c, marshalledResponse)
+
+		// Ejemplo para construir el objeto de usuarios:
+		users := make(map[int]map[string]any)
+		for id, conn := range room.Users {
+			users[id] = map[string]any{
+				"user_id":  id,
+				"username": conn.Username,
+			}
+		}
+		users_in_room, _ := json.Marshal(users)
+		if len(room.Users) > 0 {
+			// Inform the user of the other users in the room
+			marshalledResponse, _ = json.Marshal(&ActionMessage{
+				Action:  "users_in_room",
+				Content: string(users_in_room),
+				User_id: userId,
+			})
+
+			sendJSONMessage(c, marshalledResponse)
+		}
+
+		addUserToRoom("", userId, userConnection)
+
+		marshalledResponse, _ = json.Marshal(&ActionMessage{
+			Action:  "user_joined",
+			Content: userConnection.Username,
+			User_id: userId,
+		})
+
+		// Notify all users in the room about the new user
+		sendMessageToRoom("", marshalledResponse)
+	case "logout":
+		log.Printf("Logging out user with ID: %d", msg.User_id)
+		removeUserFromRoom("", msg.User_id)
+
+		marshalledResponse, _ := json.Marshal(&ActionMessage{
+			Action:  "user_left",
+			Content: "",
+			User_id: msg.User_id,
+		})
+
+		// Notify all users in the room about the new user
+		sendMessageToRoom("", marshalledResponse)
+	default:
+		log.Printf("Unknown action: %s", msg.Action)
 	}
+
 }
 
 func (wsh webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -122,10 +205,22 @@ func (wsh webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Close the WebSocket connection when serving is done
 	defer c.Close()
 
+	// Create new user id from time
+	userId := int(time.Now().UnixNano())
+
 	for {
 		mt, message, err := c.ReadMessage()
 		if err != nil {
 			log.Printf("error %s when reading message from client", err)
+			if userId != 0 {
+				removeUserFromRoom("", userId)
+				marshalledResponse, _ := json.Marshal(&ActionMessage{
+					Action:  "user_left",
+					Content: "",
+					User_id: userId,
+				})
+				sendMessageToRoom("", marshalledResponse)
+			}
 			return
 		}
 
@@ -145,7 +240,7 @@ func (wsh webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 
-			handleActionMessage(c, parsedMessage)
+			handleActionMessage(c, parsedMessage, userId)
 		}
 
 	}
