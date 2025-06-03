@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Daducos</title>
+    </head>
+    <body>
+        <div id="dice-selector">
+            <p id="socket-status">Connecting...</p>
+            <div class="dice-select" id="d4">
+                <input type="number" id="d4-input" value="0" min="0" max="100">
+                <label for="d4-input">d4</label>
+            </div>
+            <div class="dice-select" id="d6">
+                <input type="number" id="d6-input" value="0" min="0" max="100">
+                <label for="d6-input">d6</label>
+            </div>
+            <div class="dice-select" id="d8">
+                <input type="number" id="d8-input" value="0" min="0" max="100">
+                <label for="d8-input">d8</label>
+            </div>
+            <div class="dice-select" id="d10">
+                <input type="number" id="d10-input" value="0" min="0" max="100">
+                <label for="d10-input">d10</label>
+            </div>
+            <div class="dice-select" id="d12">
+                <input type="number" id="d12-input" value="0" min="0" max="100">
+                <label for="d12-input">d12</label>
+            </div>
+            <div class="dice-select" id="d20">
+                <input type="number" id="d20-input" value="0" min="0" max="100">
+                <label for="d20-input">d20</label>
+            </div>
+            <div class="dice-select" id="d100">
+                <input type="number" id="d100-input" value="0" min="0" max="100">
+                <label for="d100-input">d100</label>
+            </div>
+            <button id="roll-button">Roll Dice</button>
+            <div id="result">
+                <h2>Result</h2>
+                <p id="result-text">Click the button to roll the dice!</p>
+            </div> 
+        </div>
+    </body>
+    <script>
+        const rollButton = document.getElementById('roll-button');
+
+        rollButton.addEventListener('click', () => {
+            // Get all dice inputs
+            const diceInputs = document.querySelectorAll('.dice-select input[type="number"]');
+
+            // Add inputs to an object
+            const message = { action: 'roll', content: ""  };
+
+            diceInputs.forEach(input => {
+                const diceType = input.id.replace('-input', '');
+                const value = parseInt(input.value);
+
+                if (value > 0) {
+                    message['content'] += `${value}${diceType}+`;
+                }
+            });
+
+            if (message['content'] === "") return;
+
+            message['content'] = message['content'].slice(0, -1);
+
+            // Send data to websocket server
+            socket.send(JSON.stringify(message));
+        })
+
+        // Open a WebSocket connection
+        const socket = new WebSocket('ws://localhost:8080');  
+
+        const requestLog = () => {
+            const message = { action: 'log', content: '' };
+            // Obtain username
+            const username = prompt("Enter your username:");
+
+            if (username) {
+                message.content = username;
+            } else {
+                message.content = 'Anonymous';
+            }
+
+            // Send a request to the server to get the log
+            socket.send(JSON.stringify(message));
+        };
+
+        socket.onopen = () => {
+            document.getElementById('socket-status').textContent = 'Connected to WebSocket server';
+            requestLog()
+        };
+
+        const handleMessage = (data) => {
+            const resultText = document.getElementById('result-text');
+            switch (data.action) {
+                case 'roll':
+                    const resultJSON = JSON.parse(data.content);
+                    resultText.innerHTML = ''; // Clear previous results
+
+                    for (const [diceType, result] of Object.entries(resultJSON)) {
+                        resultText.innerHTML += `<p>${diceType}: ${result}</p>`;
+                    }
+
+                    break;
+                default:
+                    console.error('Unknown action:', data.action);
+            }
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            handleMessage(data);
+        }
+
+        // On page exit, close the WebSocket connection
+        window.addEventListener('beforeunload', () => {
+            socket.close();
+        });
+    </script>
+</html>
